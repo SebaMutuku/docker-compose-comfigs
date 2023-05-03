@@ -13,6 +13,7 @@ services:
     ports:
       - 27017:27017
 
+  
   mongo-express:
     image: mongo-express
     restart: always
@@ -23,14 +24,35 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: password
       ME_CONFIG_MONGODB_SERVER: mongodb
 
-  postgres:
+  
+  postgresql:
     image: 'bitnami/postgresql:latest'
     environment:
-      - POSTGRESQL_USERNAME=user
-      - POSTGRESQL_PASSWORD=password123
-      - POSTGRESQL_DATABASE=CarfuelDB
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password123
+      - POSTGRES_DB=postgres
     ports:
       - 5432:5432
+    volumes:
+      - 'postgresql_data:/bitnami/postgresql'
+      
+
+  keycloak:
+   image: 'bitnami/keycloak:latest'
+   ports: 
+     - 80:8080
+
+   environment: 
+     - KEYCLOAK_CREATE_ADMIN_USER=true
+     - KEYCLOAK_DATABASE_NAME=keycloak
+     - KEYCLOAK_DATABASE_USER=postgres
+     - KEYCLOAK_DATABASE_PASSWORD=password123
+     - KEYCLOAK_USER=admin
+     - KEYCLOAK_PASSWORD=admin
+   depends_on: 
+     -   postgresql
+
 
 volumes:
-  {}
+   postgresql_data:
+    driver: local
